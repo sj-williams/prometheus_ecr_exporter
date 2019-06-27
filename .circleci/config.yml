@@ -12,6 +12,7 @@ jobs:
           REPONAME: prometheus_ecr_exporter
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: Build application Docker image
           command: |
