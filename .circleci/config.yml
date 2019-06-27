@@ -1,0 +1,19 @@
+version: 2
+jobs:
+  build:
+    branches:
+      only:
+       master
+    working_directory: /app
+    docker:
+      - image: circleci/buildpack-deps:stretch
+        environment:
+          ECR_ENDPOINT: 75425662182.dkr.ecr.eu-west-2.amazonaws.com
+          GITHUB_TEAM_NAME_SLUG: cloud-platform
+          REPONAME: prometheus_ecr_exporter
+    steps:
+      - checkout
+      - run:
+          name: Build application Docker image
+          command: |
+            docker build -t "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:${CIRCLE_SHA1}" .
