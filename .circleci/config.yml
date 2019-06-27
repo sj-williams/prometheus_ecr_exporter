@@ -6,14 +6,24 @@ jobs:
        master
     docker:
       - image: circleci/buildpack-deps:stretch
+        aws_auth:
+          aws_access_key_id: ${AWS_ACCESS_KEY_ID}
+          aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
         environment:
-          ECR_ENDPOINT: 75425662182.dkr.ecr.eu-west-2.amazonaws.com
-          GITHUB_TEAM_NAME_SLUG: cloud-platform
-          REPONAME: prometheus_ecr_exporter
+          IMAGE_URI: 75425662182.dkr.ecr.eu-west-2.amazonaws.com/cloud-platform/prometheus_ecr_exporter
     steps:
       - checkout
       - setup_remote_docker
       - run:
           name: Build application Docker image
           command: |
-            docker build -t "${ECR_ENDPOINT}/${GITHUB_TEAM_NAME_SLUG}/${REPONAME}:${CIRCLE_SHA1}" .
+            docker build -t "${IMAGE_URI}:${CIRCLE_SHA1}" .
+      - push:
+          name: Push application Docker image
+          command: |
+            $(aws ecr get-login --no-include-email)
+            docker push "${IMAGE_URI}:${CIRCLE_SHA1}"
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              docker tag "${IMAGE_URI}:${CIRCLE_SHA1}" "${IMAGE_URI}:latest"
+              docker push "${IMAGE_URI}:latest"
+            fi
