@@ -20,6 +20,10 @@ jobs:
           command: |
             docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASS
             docker push "${IMAGE_URI}:${CIRCLE_SHA1}"
+            if [ ! -z "${CIRCLE_TAG}" ]; then
+              docker tag "${IMAGE_URI}:${CIRCLE_SHA1}" "${IMAGE_URI}:${CIRCLE_TAG}"
+              docker push "${IMAGE_URI}:${CIRCLE_TAG}"
+            fi
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               docker tag "${IMAGE_URI}:${CIRCLE_SHA1}" "${IMAGE_URI}:latest"
               docker push "${IMAGE_URI}:latest"
