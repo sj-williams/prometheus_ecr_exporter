@@ -35,8 +35,8 @@ func main() {
 	// This section will start the HTTP server and expose
 	// any metrics on the /metrics endpoint.
 	http.Handle("/metrics", promhttp.Handler())
-	log.Println("Beginning to serve on port :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Println("Beginning to serve on port :9606")
+	log.Fatal(http.ListenAndServe(":9606", nil))
 }
 
 func imageCounter(svc *ecr.ECR) error {

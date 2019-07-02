@@ -14,4 +14,5 @@ RUN \
 FROM scratch
 COPY --from=builder /build/ecr_exporter /
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+EXPOSE 9606/tcp
 ENTRYPOINT ["/ecr_exporter"]
