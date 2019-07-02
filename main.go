@@ -21,19 +21,20 @@ var (
 )
 
 func main() {
+	sess, err := session.NewSession()
+	if err != nil {
+		log.Fatal(err)
+	}
 	go func() {
-		svc := ecr.New(session.New())
+		svc := ecr.New(sess)
 		for {
 			err := imageCounter(svc)
 			if err != nil {
-				log.Printf("Failed to count images: %v", err)
+				log.Fatalf("Failed to count images: %v", err)
 			}
 			time.Sleep(time.Minute)
 		}
 	}()
-
-	// This section will start the HTTP server and expose
-	// any metrics on the /metrics endpoint.
 	http.Handle("/metrics", promhttp.Handler())
 	log.Println("Beginning to serve on port :9606")
 	log.Fatal(http.ListenAndServe(":9606", nil))
