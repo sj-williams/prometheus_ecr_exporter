@@ -15,14 +15,18 @@ jobs:
       - deploy:
           name: Push application Docker image
           command: |
+            if [ "${CIRCLE_BRANCH}" != "master" ]; then
+                echo "Will not push images from non-master branches"
+                exit 0
+            fi
             docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASS
-            docker push "${IMAGE_URI}:${CIRCLE_SHA1}"
             if [ ! -z "${CIRCLE_TAG}" ]; then
               docker tag "${IMAGE_URI}:${CIRCLE_SHA1}" "${IMAGE_URI}:${CIRCLE_TAG}"
               docker push "${IMAGE_URI}:${CIRCLE_TAG}"
               docker tag "${IMAGE_URI}:${CIRCLE_SHA1}" "${IMAGE_URI}:latest"
               docker push "${IMAGE_URI}:latest"
-            elif [ "${CIRCLE_BRANCH}" == "master" ]; then
+            else
+              docker push "${IMAGE_URI}:${CIRCLE_SHA1}"
               docker tag "${IMAGE_URI}:${CIRCLE_SHA1}" "${IMAGE_URI}:master"
               docker push "${IMAGE_URI}:master"
             fi
