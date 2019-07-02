@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
@@ -20,8 +20,16 @@ jobs:
             if [ ! -z "${CIRCLE_TAG}" ]; then
               docker tag "${IMAGE_URI}:${CIRCLE_SHA1}" "${IMAGE_URI}:${CIRCLE_TAG}"
               docker push "${IMAGE_URI}:${CIRCLE_TAG}"
-            fi
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
               docker tag "${IMAGE_URI}:${CIRCLE_SHA1}" "${IMAGE_URI}:latest"
               docker push "${IMAGE_URI}:latest"
+            elif [ "${CIRCLE_BRANCH}" == "master" ]; then
+              docker tag "${IMAGE_URI}:${CIRCLE_SHA1}" "${IMAGE_URI}:master"
+              docker push "${IMAGE_URI}:master"
             fi
+workflows:
+  build_release:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
