@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -35,6 +36,9 @@ func main() {
 			time.Sleep(time.Minute)
 		}
 	}()
+	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Healthy")
+	})
 	http.Handle("/metrics", promhttp.Handler())
 	log.Println("Beginning to serve on port :9606")
 	log.Fatal(http.ListenAndServe(":9606", nil))
