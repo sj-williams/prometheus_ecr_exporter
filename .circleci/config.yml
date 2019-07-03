@@ -17,18 +17,17 @@ jobs:
           command: |
             docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASS
             if [ ! -z "${CIRCLE_TAG}" ]; then
-              if [ "${CIRCLE_BRANCH}" != "master" ]; then
-                  echo "Will not push images from non-master branches"
-                  exit 0
-              fi
               docker tag "${IMAGE_URI}:${CIRCLE_SHA1}" "${IMAGE_URI}:${CIRCLE_TAG}"
               docker push "${IMAGE_URI}:${CIRCLE_TAG}"
               docker tag "${IMAGE_URI}:${CIRCLE_SHA1}" "${IMAGE_URI}:latest"
               docker push "${IMAGE_URI}:latest"
-            else
+            elif [ "${CIRCLE_BRANCH}" == "master" ]; then
               docker push "${IMAGE_URI}:${CIRCLE_SHA1}"
               docker tag "${IMAGE_URI}:${CIRCLE_SHA1}" "${IMAGE_URI}:master"
               docker push "${IMAGE_URI}:master"
+            else
+              echo "Will not push images from non-master branches"
+              exit 0
             fi
 workflows:
   build_release:
